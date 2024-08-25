@@ -5,6 +5,7 @@ import (
 	"fmt"
 	"instawham/controllers"
 	"instawham/initializers"
+	"instawham/middleware"
 	"io"
 	"net/http"
 
@@ -33,7 +34,7 @@ func main() {
 		})
 	})
 
-	server.GET("/posts", func(ctx *gin.Context) {
+	server.GET("/posts", func(c *gin.Context) {
 		responseChan := make(chan []Post)
 
 		go func() {
@@ -64,11 +65,17 @@ func main() {
 
 		posts := <-responseChan
 		if posts == nil {
-			ctx.JSON(500, gin.H{"error": "Error fetching posts"})
+			c.JSON(500, gin.H{"error": "Error fetching posts"})
 			return
 		}
 
-		ctx.HTML(200, "posts", gin.H{"posts": posts})
+		c.HTML(200, "posts", gin.H{"posts": posts})
+	})
+
+	server.GET("/createpost", func(c *gin.Context) {
+		c.HTML(200, "createpost.html", gin.H{
+			"Title": "Create Post",
+		})
 	})
 
 	server.GET("/signup", func(c *gin.Context) {
@@ -76,6 +83,8 @@ func main() {
 	})
 	server.POST("/signup", controllers.SignUp)
 	server.POST("/login", controllers.Login)
+
+	server.GET("/validate", middleware.CheckJwt, controllers.Validate)
 
 	server.Run(":8080")
 }
