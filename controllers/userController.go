@@ -97,4 +97,11 @@ func Login(c *gin.Context) {
 }
 
 func Validate(c *gin.Context) {
+	user, exists := c.Get("user")
+	if !exists {
+		c.JSON(http.StatusBadRequest, "user unable to be retrieved")
+	}
+	c.JSON(200, gin.H{
+		"user": user,
+	})
 }
