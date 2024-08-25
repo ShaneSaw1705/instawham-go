@@ -1,0 +1,9 @@
+{{define "posts"}}
+{{range .posts}}
+<div class="post">
+  <h2 class='post-title'>{{.Title}}</h2>
+  <p>{{.Body}}</p>
+  <button class="btn">Read more</button>
+</div>
+{{end}}
+{{end}}
