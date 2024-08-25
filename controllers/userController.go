@@ -42,7 +42,9 @@ func SignUp(c *gin.Context) {
 		c.JSON(http.StatusBadRequest, gin.H{"error": "Failed to create user"})
 	}
 	// Respond
-	c.JSON(200, "User created")
+	// c.JSON(200, "User created")
+	c.Header("HX-Redirect", "/")
+	c.Status(http.StatusNoContent)
 }
 
 func Login(c *gin.Context) {
@@ -77,7 +79,6 @@ func Login(c *gin.Context) {
 	}
 
 	// jwt token logic
-	// ...
 	token := jwt.NewWithClaims(jwt.SigningMethodHS256, jwt.MapClaims{
 		"sub": user.ID,
 		"exp": time.Now().Add(time.Hour * 24).Unix(),
@@ -94,6 +95,9 @@ func Login(c *gin.Context) {
 	// Return jwt token
 	c.SetSameSite(http.SameSiteLaxMode)
 	c.SetCookie("auth", tokenString, 3600*24, "", "", false, true)
+
+	c.Header("HX-Redirect", "/")
+	c.Status(http.StatusNoContent)
 }
 
 func Validate(c *gin.Context) {

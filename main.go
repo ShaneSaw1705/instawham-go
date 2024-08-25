@@ -32,6 +32,10 @@ func main() {
 	server.GET("/signup", func(c *gin.Context) {
 		c.HTML(200, "signup.html", gin.H{"Title": "Signup"})
 	})
+	server.GET("/login", func(c *gin.Context) {
+		c.HTML(200, "login.html", gin.H{"Title": "Login"})
+	})
+
 	server.POST("/signup", controllers.SignUp)
 	server.POST("/login", controllers.Login)
 

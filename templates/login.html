@@ -14,14 +14,14 @@
 
 <body>
   <div class="container">
-    <form class="createpost" hx-post='/signup' hx-target='#outcome' hx-swap='innerHTML'>
-      <h3>Sign-up</h3>
+    <form class="createpost" hx-post='/login' hx-target='#outcome' hx-swap='innerHTML'>
+      <h3>Sign-in</h3>
       <label for="email">Email</label>
       <input type="text" id="email" name="email" />
       <label for="password">Password</label>
       <input type="password" id="password" name="password" />
-      <button type="submit" class="btn">Signup</button>
-      <a href="/login">Already have an account?</a>
+      <button type="submit" class="btn">Login</button>
+      <a href="/signup">New? create an account</a>
     </form>
 
     <div id="outcome"></div>
