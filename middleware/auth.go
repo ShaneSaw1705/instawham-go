@@ -14,36 +14,49 @@ import (
 func CheckJwt(c *gin.Context) {
 	tokenString, err := c.Cookie("auth")
 	if err != nil {
-		c.AbortWithStatus(401)
+		// Redirect to the login page if the cookie is missing
+		c.Redirect(302, "/login")
+		return
 	}
+
 	token, err := jwt.Parse(tokenString, func(token *jwt.Token) (interface{}, error) {
-		// Don't forget to validate the alg is what you expect:
+		// Ensure the signing method is what you expect
 		if _, ok := token.Method.(*jwt.SigningMethodHMAC); !ok {
 			return nil, fmt.Errorf("Unexpected signing method: %v", token.Header["alg"])
 		}
 
-		// hmacSampleSecret is a []byte containing your secret, e.g. []byte("my_secret_key")
+		// Return the secret key for validation
 		return []byte(os.Getenv("SECRET")), nil
 	})
 	if err != nil {
-		c.AbortWithStatus(401)
+		// Redirect to the login page if token parsing fails
+		c.Redirect(302, "/login")
+		return
 	}
 
 	if claims, ok := token.Claims.(jwt.MapClaims); ok {
+		// Check token expiration
 		if float64(time.Now().Unix()) > claims["exp"].(float64) {
-			c.AbortWithStatus(401)
+			c.Redirect(302, "/login")
+			return
 		}
+
 		var user models.User
 		initializers.DB.First(&user, claims["sub"])
 
+		// Check if the user exists in the database
 		if user.ID == 0 {
-			c.AbortWithStatus(401)
+			c.Redirect(302, "/login")
+			return
 		}
 
+		// Set user information in the context
 		c.Set("user", user)
 
+		// Continue to the next handler
 		c.Next()
 	} else {
-		c.AbortWithStatus(401)
+		c.Redirect(302, "/login")
+		return
 	}
 }
