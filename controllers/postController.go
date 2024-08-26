@@ -18,7 +18,7 @@ func FetchPost(c *gin.Context) {
 
 	go func() {
 		var posts []Post
-		result := initializers.DB.Order("created_at desc").Find(&posts)
+		result := initializers.DB.Order("created_at desc").Limit(50).Find(&posts)
 		if result.Error != nil {
 			c.JSON(http.StatusBadRequest, gin.H{"Error": "failed to find posts"})
 		}
