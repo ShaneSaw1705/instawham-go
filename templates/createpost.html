@@ -13,7 +13,7 @@
 
 <body>
   <div class="container">
-    <form class="createpost">
+    <form class="createpost" hx-post='/createpost' hx-target='#outcome' hx-swap="innerHTML">
       <label for="title">Title</label>
       <input type="text" name="title" />
       <label for="description">Description</label>
@@ -21,6 +21,7 @@
       <button class="btn">Submit</button>
     </form>
   </div>
+  <div id="outcome"></div>
 </body>
 
 </html>
