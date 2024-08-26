@@ -25,7 +25,7 @@ func main() {
 
 	server.GET("/posts", controllers.FetchPost)
 
-	server.GET("/createpost", func(c *gin.Context) {
+	server.GET("/createpost", middleware.CheckJwt, func(c *gin.Context) {
 		c.HTML(200, "createpost.html", gin.H{"Title": "Create Post"})
 	})
 
