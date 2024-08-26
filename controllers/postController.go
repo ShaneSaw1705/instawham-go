@@ -1,53 +1,69 @@
 package controllers
 
 import (
-	"encoding/json"
-	"fmt"
-	"io"
+	"instawham/initializers"
+	"instawham/models"
 	"net/http"
 
 	"github.com/gin-gonic/gin"
 )
 
 type Post struct {
-	Title string `json:"title"`
-	Body  string `json:"body"`
+	Title       string `json:"title"`
+	Description string `json:"description"`
 }
 
-func FetchPosts(c *gin.Context) {
+func FetchPost(c *gin.Context) {
 	responseChan := make(chan []Post)
 
 	go func() {
-		resp, err := http.Get("https://jsonplaceholder.typicode.com/posts")
-		if err != nil {
-			fmt.Println("Error fetching from address", err)
-			responseChan <- nil
-			return
-		}
-		defer resp.Body.Close()
-
-		body, err := io.ReadAll(resp.Body)
-		if err != nil {
-			fmt.Println("error reading body", err)
-			responseChan <- nil
-			return
-		}
-
 		var posts []Post
-		if err := json.Unmarshal(body, &posts); err != nil {
-			fmt.Println("Error unmarshalling JSON", err)
-			responseChan <- nil
-			return
+		result := initializers.DB.Find(&posts)
+		if result.Error != nil {
+			c.JSON(http.StatusBadRequest, gin.H{"Error": "failed to find posts"})
 		}
 
 		responseChan <- posts
 	}()
-
 	posts := <-responseChan
 	if posts == nil {
-		c.JSON(500, gin.H{"error": "Error fetching posts"})
-		return
+		c.JSON(http.StatusBadRequest, gin.H{"Error": "failed to read posts"})
 	}
 
 	c.HTML(200, "posts", gin.H{"posts": posts})
+}
+
+func CreatePost(c *gin.Context) {
+	user, exists := c.Get("user")
+	if !exists {
+		c.JSON(http.StatusUnauthorized, gin.H{"Error": "user not found"})
+		return
+	}
+
+	authenticatedUser, ok := user.(models.User)
+	if !ok {
+		c.JSON(http.StatusUnauthorized, gin.H{"Error": "user type assertion failed"})
+		return
+	}
+
+	var body struct {
+		Title       string `form:"title"`
+		Description string `form:"description"`
+	}
+
+	err := c.Bind(&body)
+	if err != nil {
+		c.JSON(http.StatusBadRequest, gin.H{"Error": "error reading body"})
+		return
+	}
+
+	post := models.Post{
+		Title:       body.Title,
+		Description: body.Description,
+		AuthorID:    int(authenticatedUser.ID),
+	}
+
+	initializers.DB.Create(&post)
+
+	c.JSON(http.StatusOK, gin.H{"Success": "post created"})
 }

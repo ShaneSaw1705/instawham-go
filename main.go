@@ -23,7 +23,7 @@ func main() {
 		c.HTML(200, "index.html", gin.H{"Title": "Hello World"})
 	})
 
-	server.GET("/posts", controllers.FetchPosts)
+	server.GET("/posts", controllers.FetchPost)
 
 	server.GET("/createpost", func(c *gin.Context) {
 		c.HTML(200, "createpost.html", gin.H{"Title": "Create Post"})
@@ -38,6 +38,8 @@ func main() {
 
 	server.POST("/signup", controllers.SignUp)
 	server.POST("/login", controllers.Login)
+
+	server.POST("/createpost", middleware.CheckJwt, controllers.CreatePost)
 
 	server.GET("/validate", middleware.CheckJwt, controllers.Validate)
 

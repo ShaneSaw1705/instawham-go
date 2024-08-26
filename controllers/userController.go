@@ -96,7 +96,7 @@ func Login(c *gin.Context) {
 	c.SetSameSite(http.SameSiteLaxMode)
 	c.SetCookie("auth", tokenString, 3600*24, "", "", false, true)
 
-	c.Header("HX-Redirect", "/")
+	c.Header("HX-Redirect", "/login")
 	c.Status(http.StatusNoContent)
 }
 
