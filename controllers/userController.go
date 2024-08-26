@@ -34,17 +34,24 @@ func SignUp(c *gin.Context) {
 		c.JSON(http.StatusFailedDependency, gin.H{"Error": "Error hashing password"})
 		return
 	}
+	// Look up user
+	var previousUser models.User
+	initializers.DB.First(&previousUser, "email = ?", body.Email)
+	if previousUser.ID != 0 {
+		// c.JSON(http.StatusSeeOther, gin.H{"message": "A user already exists under that email"})
+		c.HTML(200, "error", gin.H{"message": "A User already exists under that email"})
+		return
+	}
 	// Create user
 	user := models.User{Email: body.Email, Password: string(hash)}
 	result := initializers.DB.Create(&user)
 
 	if result.Error != nil {
-		c.JSON(http.StatusBadRequest, gin.H{"error": "Failed to create user"})
+		c.JSON(http.StatusBadRequest, gin.H{"Error": "Failed to create user"})
+		return
 	}
 	// Respond
-	// c.JSON(200, "User created")
-	c.Header("HX-Redirect", "/")
-	c.Status(http.StatusNoContent)
+	c.HTML(200, "error", gin.H{"message": "User created! please proceed to login"})
 }
 
 func Login(c *gin.Context) {

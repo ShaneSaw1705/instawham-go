@@ -99,7 +99,7 @@ body {
 }
 
 .createpost {
-  background: black;
+  background: #1f2937;
   display: flex;
   flex-direction: column;
   gap: 10px;
@@ -109,6 +109,10 @@ body {
   border-radius: 20px;
 }
 
+.createpost a {
+  color: white;
+}
+
 .createpost input {
   padding: 20px;
   margin-bottom: 10px;
@@ -116,4 +120,18 @@ body {
   border: 1px solid #4b5563;
   background-color: #374151;
   color: white;
+}
+
+
+.error-message {
+  position: absolute;
+  top: 30px;
+  left: 0;
+  right: 0;
+  margin: 0 auto;
+  background: #1f2937;
+  padding: 15px;
+  border-radius: 15px;
+  width: fit-content;
+  /* or a specific width */
 }
