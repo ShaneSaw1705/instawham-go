@@ -14,10 +14,10 @@ type Post struct {
 }
 
 func FetchPost(c *gin.Context) {
-	responseChan := make(chan []Post)
+	responseChan := make(chan []models.Post)
 
 	go func() {
-		var posts []Post
+		var posts []models.Post
 		result := initializers.DB.Order("created_at desc").Limit(50).Find(&posts)
 		if result.Error != nil {
 			c.JSON(http.StatusBadRequest, gin.H{"Error": "failed to find posts"})
@@ -31,6 +31,24 @@ func FetchPost(c *gin.Context) {
 	}
 
 	c.HTML(200, "posts", gin.H{"posts": posts})
+}
+
+func FetchSinglePost(c *gin.Context) {
+	responseChan := make(chan models.Post)
+	id := c.Param("id")
+
+	go func() {
+		var post models.Post
+		result := initializers.DB.First(&post, "ID = ?", id)
+		if result.Error != nil {
+			c.JSON(http.StatusNotFound, gin.H{"message": "Post no longer exists"})
+			return
+		}
+		responseChan <- post
+	}()
+
+	post := <-responseChan
+	c.JSON(200, post)
 }
 
 func CreatePost(c *gin.Context) {
