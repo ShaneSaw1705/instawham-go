@@ -1,6 +1,7 @@
 package controllers
 
 import (
+	"fmt"
 	"instawham/initializers"
 	"instawham/models"
 	"net/http"
@@ -48,7 +49,8 @@ func FetchSinglePost(c *gin.Context) {
 	}()
 
 	post := <-responseChan
-	c.JSON(200, post)
+	fmt.Println(post)
+	c.HTML(200, "postpage", gin.H{"post": post})
 }
 
 func CreatePost(c *gin.Context) {
